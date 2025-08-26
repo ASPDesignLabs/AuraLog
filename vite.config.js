@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: "autoUpdate",
       includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png"],
       manifest: {
-        name: "Health Tracker",
-        short_name: "HealthTracker",
+        name: "AuraLog",
+        short_name: "AuraLog",
         start_url: ".",
         display: "standalone",
         background_color: "#ffffff",

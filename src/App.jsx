@@ -91,7 +91,7 @@ function App() {
                 <span>HEV Mk III</span>
               </>
             ) : (
-              "Health Tracker"
+              "AuraLog"
             )}
           </h1>
 

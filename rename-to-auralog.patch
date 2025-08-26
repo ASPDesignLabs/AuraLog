@@ -1,0 +1,40 @@
+diff --git a/index.html b/index.html
+--- a/index.html
++++ b/index.html
+@@
+-    <title>Health Tracker</title>
++    <title>Auralog</title>
+diff --git a/src/App.jsx b/src/App.jsx
+--- a/src/App.jsx
++++ b/src/App.jsx
+@@
+             ) : (
+-              "Health Tracker"
++              "Auralog"
+             )}
+           </h1>
+ 
+diff --git a/vite.config.js b/vite.config.js
+--- a/vite.config.js
++++ b/vite.config.js
+@@
+       includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png"],
+       manifest: {
+-        name: "Health Tracker",
+-        short_name: "HealthTracker",
++        name: "Auralog",
++        short_name: "Auralog",
+         start_url: ".",
+         display: "standalone",
+         background_color: "#ffffff",
+diff --git a/public/manifest.json b/public/manifest.json
+--- a/public/manifest.json
++++ b/public/manifest.json
+@@
+-  "name": "Health Tracker",
+-  "short_name": "HealthTracker",
++  "name": "Auralog",
++  "short_name": "Auralog",
+   "start_url": ".",
+   "display": "standalone",
+   "background_color": "#ffffff",

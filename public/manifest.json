@@ -1,6 +1,6 @@
 {
-  "name": "Health Tracker",
-  "short_name": "HealthTracker",
+  "name": "AuraLog",
+  "short_name": "AuraLog",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
