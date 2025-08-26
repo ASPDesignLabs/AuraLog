@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ripple animation (StimmingSurface) */
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(8);
+    opacity: 0;
+  }
+}
+.animate-ripple {
+  animation: ripple 1s ease-out forwards;
+}
+
+/* === Global Theme Text Fixes === */
+
+/* Light mode (default) */
+.light body {
+  color: #1f2937; /* Tailwind gray-800 */
+  background-color: #f9fafb; /* gray-50 */
+}
+
+/* Dark mode */
+.dark body {
+  color: #f3f4f6; /* Tailwind gray-100 */
+  background-color: #111827; /* gray-900 */
+}
+
+/* HEV Mk III mode */
+.hev body {
+  color: #ffb347; /* amber/orange text */
+  background: linear-gradient(to bottom, #1a1a1a 0%, #404040 100%);
+  position: relative;
+}
+
+/* Scanline overlay for HEV */
+.hev body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.2) 0px,
+    rgba(255, 255, 255, 0.2) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card styling */
+.card {
+  @apply p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all;
+}
+.hev .card {
+  border: 2px solid #ff8000;
+  box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
+  background-color: rgba(40, 40, 40, 0.85);
+  color: #ffb347;
+}
