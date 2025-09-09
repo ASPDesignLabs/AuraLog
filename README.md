@@ -152,7 +152,7 @@ These packages live under `"devDependencies"`:
 Clone and install all dependencies:
 
 ```bash
-git clone https://github.com/<your-username>/auralog.git
+git clone https://github.com/ASPDesignLabs/auralog.git
 cd auralog
 npm install
 ```
