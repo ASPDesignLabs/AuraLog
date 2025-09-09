@@ -102,9 +102,54 @@ See [CHANGELOG.md](./CHANGELOG.md) for detailed technical history.
 
 ---
 
-## 🚦 Usage
+## 💻 Requirements / Dependencies
 
-Clone and install:
+To build and run Auralog you need:
+
+### System Prerequisites
+- **Node.js v18+** — JavaScript runtime needed for Vite, React build tools.  
+- **npm** (bundled with Node) or **yarn/pnpm** — dependency manager.  
+- **Git** — to clone the repository.  
+- **A modern browser** (Chrome, Firefox, Safari) with support for:
+  - Service Workers (for offline/PWA install),
+  - WebAuthn/Passkeys (for biometric login).
+
+### Runtime Dependencies (used in the app)
+These packages are installed under `"dependencies"` in `package.json`:
+
+- **react** / **react-dom**: React core libraries for UI and rendering.  
+- **dexie**: IndexedDB wrapper used as Auralog’s encrypted local database.  
+- **crypto-js**: Used for PIN hashing (SHA‑256) before key derivation.  
+- **chart.js**: Graphing library for metrics visualization (calories, sleep, etc).  
+- **jspdf**: Generate encrypted PDF health reports locally, no server round‑trip.  
+- **html2canvas**: Capture DOM elements for export/report visuals.  
+- **three**: 3D visualization library (calorie ring, weight bar progress meter).  
+- **react-speech-recognition**: Provides microphone transcription hooks for accessibility.  
+- **workbox-build**: Used to build service workers for caching/offline PWA support.
+
+### Development Dependencies (tooling for dev/build/lint)
+These packages live under `"devDependencies"`:
+
+- **vite**: Modern dev server + bundler.  
+- **@vitejs/plugin-react**: Adds React fast refresh support to Vite.  
+- **vite-plugin-pwa**: PWA manifest + service worker auto‑integration.  
+- **tailwindcss**: Utility‑first CSS framework for responsive theming.  
+- **postcss**: CSS transformer required by Tailwind.  
+- **autoprefixer**: Adds vendor prefixes to CSS.  
+- **typescript**: TypeScript support.  
+- **@types/react** / **@types/react-dom**: TypeScript React typings.  
+- **eslint**: Linter for quality control.  
+- **@eslint/js**: ESLint recommended base rules.  
+- **typescript-eslint**: ESLint TypeScript integration.  
+- **eslint-plugin-react-hooks**: Ensures proper hook usage.  
+- **eslint-plugin-react-refresh**: Ensures React Fast Refresh compatibility.  
+- **globals**: Predefined ESLint globals list.
+
+---
+
+## ⚙️ Install & Run
+
+Clone and install all dependencies:
 
 ```bash
 git clone https://github.com/<your-username>/auralog.git
@@ -112,17 +157,29 @@ cd auralog
 npm install
 ```
 
-Run dev server:
+Run locally for development:
 
 ```bash
 npm run dev
 ```
 
-Build and preview production:
+Build production bundle:
 
 ```bash
 npm run build
 npm run preview
+```
+
+---
+
+## 🌐 HTTPS Requirement
+
+PWAs require HTTPS (or `localhost`) for install:
+
+- Local dev: `http://localhost:5173` works fine.  
+- Production: deploy to **HTTPS URL** (GitHub Pages, Netlify, Vercel, or server with SSL).  
+
+Without HTTPS Auralog cannot be installed, service workers won’t run, and passkeys won’t work.
 ```
 
 Reset DB if schema migrated:
