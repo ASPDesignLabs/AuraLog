@@ -110,20 +110,25 @@ Reset Database:
 
 ## 🙌 Contributing & Credits
 
-Auralog stands entirely on the shoulders of giants. This project’s security, accessibility, and wellness support wouldn’t be possible without the incredible work of open source maintainers:
+I can't even begin to express my gratitude to everyone who threw a ton of effort into making the tools that were
+used to make AuraLog possible. 
 
-- **React** — Meta Open Source, core hooks/components.  
-- **Vite** — Evan You & team for lightning‑fast PWA builds.  
-- **Tailwind CSS** — Tailwind Labs, for design consistency and theme responsiveness.  
-- **Dexie.js** — David Fahlander & contributors, for IndexedDB abstraction.  
-- **Chart.js** — Chart.js community maintainers.  
-- **jsPDF** — James Hall & contributors, for local PDF reports.  
-- **Three.js** — Ricardo Cabello (mrdoob) & team, for beautiful meters.  
-- **vite-plugin-pwa** — Anthony Fu, for offline readiness.  
-- **Workbox** — Google Chrome team, for reliable service workers.  
-- **react-speech-recognition** — James Brill & contributors, for accessibility.
+A genuinely life changing experience only possible due to the talent of the folks listed below:
 
-💡 **Overwhelming credit goes to these authors and their communities**, whose free contributions have made it possible to deliver a HIPAA‑aimed, privacy‑centric wellness tracker in the open source spirit.
+- [**React**](https://react.dev/) — Meta Open Source  
+- [**Vite**](https://vitejs.dev/) — Evan You & team  
+- [**Tailwind CSS**](https://tailwindcss.com/) — Tailwind Labs  
+- [**Dexie.js**](https://dexie.org/) — David Fahlander & contributors  
+- [**Chart.js**](https://www.chartjs.org/) — Chart.js community  
+- [**jsPDF**](https://github.com/parallax/jsPDF) — James Hall & contributors  
+- [**Three.js**](https://threejs.org/) — Ricardo Cabello (mrdoob) & team  
+- [**Vite PWA Plugin**](https://vite-pwa-org.netlify.app/) — Anthony Fu  
+- [**Workbox**](https://developer.chrome.com/docs/workbox/) — Google Chrome team  
+- [**react-speech-recognition**](https://www.npmjs.com/package/react-speech-recognition) — James Brill & contributors
+
+💡 **This absolutely would not have happened without the OSS community**
+
+(Seriously, ya'll are awesome!) 
 
 ---
 
