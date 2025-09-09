@@ -1,62 +1,50 @@
 import { useState, useEffect } from "react";
-import { db } from "../db/schema.js";
+import { secureAdd, secureGetLatest } from "../utils/encryption.js";
 
 export default function SleepTracker() {
   const [hours, setHours] = useState(null);
   const [tempHours, setTempHours] = useState("");
-  const minTarget = 6;
 
+  // Load latest hours after DB is unlocked
   useEffect(() => {
-    const today = new Date().toLocaleDateString("en-US");
-    db.sleep
-      .where("date")
-      .equals(today)
-      .first()
-      .then((entry) => {
-        if (entry) setHours(entry.hours);
-      });
-
-    const now = new Date();
-    const resetTime = new Date();
-    resetTime.setHours(10, 0, 0, 0);
-    if (now > resetTime) resetTime.setDate(resetTime.getDate() + 1);
-    const timeout = resetTime.getTime() - now.getTime();
-    const timer = setTimeout(() => {
-      setHours(null);
-      setTempHours("");
-    }, timeout);
-
-    return () => clearTimeout(timer);
+    const load = async () => {
+      if (!window.sessionDEK) return;
+      const latest = await secureGetLatest("sleep");
+      setHours(latest ? latest.hours : null);
+    };
+    load();
   }, []);
 
   const handleSubmit = async () => {
-    const today = new Date().toLocaleDateString("en-US");
-    setHours(tempHours);
-    await db.sleep.put({ date: today, hours: Number(tempHours) });
-    setTempHours("");
-  };
+    if (!tempHours) return;
+    const now = new Date();
 
-  const progress = Math.min(((hours || 0) / minTarget) * 100, 100);
+    await secureAdd("sleep", {
+      hours: Number(tempHours),
+      timestamp: now.toISOString(),
+      time: now.toLocaleTimeString("en-US"),
+    });
+
+    const latest = await secureGetLatest("sleep");
+    setHours(latest ? latest.hours : null);
+    setTempHours("");
+    alert("✅ Sleep entry saved");
+  };
 
   return (
     <div className="card p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all">
       <h2 className="text-lg font-bold mb-2">Sleep Tracker</h2>
+
       <p className="text-sm mb-2">
-        {hours !== null ? `${hours} hrs` : "No entry yet"} (Min: {minTarget})
+        {hours !== null ? `${hours} hrs` : "No entry yet"}
       </p>
-      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
-        <div
-          className="h-4 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 transition-all"
-          style={{ width: `${progress}%` }}
-        ></div>
-      </div>
-      <div className="mt-4 flex space-x-2">
+
+      <div className="flex space-x-2">
         <input
           type="number"
-          min="0"
           value={tempHours}
           onChange={(e) => setTempHours(e.target.value)}
-          className="flex-1 p-2 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+          className="flex-1 p-2 rounded-xl border focus:ring-2 focus:outline-none"
           placeholder="Hours slept"
         />
         <button

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { db } from "../db/schema.js";
 import * as THREE from "three";
+import { secureAdd, secureGetLatest } from "../utils/encryption.js";
 
 export default function WeightMeter() {
   const [weight, setWeight] = useState(null);
@@ -10,45 +10,27 @@ export default function WeightMeter() {
   const mountRef = useRef(null);
 
   useEffect(() => {
-    const now = new Date();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-    monday.setHours(0, 0, 0, 0);
-    const weekStart = monday.toLocaleDateString("en-US");
-
-    db.weight
-      .where("date")
-      .equals(weekStart)
-      .first()
-      .then((entry) => {
-        if (entry) {
-          setWeight(entry.value);
-          setTempWeight(entry.value);
-        }
-      });
-
-    const resetTime = new Date(monday);
-    resetTime.setDate(monday.getDate() + 7);
-    resetTime.setHours(2, 0, 0, 0);
-    const timeout = resetTime.getTime() - now.getTime();
-    const timer = setTimeout(() => {
-      setWeight(null);
-      setTempWeight("");
-    }, timeout);
-
-    return () => clearTimeout(timer);
+    const load = async () => {
+      if (!window.sessionDEK) return;
+      const latest = await secureGetLatest("weight");
+      setWeight(latest ? latest.value : null);
+    };
+    load();
   }, []);
 
   const handleSubmit = async () => {
+    if (!tempWeight) return;
     const now = new Date();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
-    monday.setHours(0, 0, 0, 0);
-    const weekStart = monday.toLocaleDateString("en-US");
 
-    setWeight(tempWeight);
-    await db.weight.put({ date: weekStart, value: tempWeight });
-    alert("Weekly weight logged!");
+    await secureAdd("weight", {
+      value: Number(tempWeight),
+      timestamp: now.toISOString(),
+      time: now.toLocaleTimeString("en-US"),
+    });
+
+    const latest = await secureGetLatest("weight");
+    setWeight(latest ? latest.value : null);
+    setTempWeight("");
   };
 
   const progress =
@@ -57,37 +39,38 @@ export default function WeightMeter() {
       : 0;
 
   useEffect(() => {
-    const mount = mountRef.current;
-    if (!mount) return;
+    if (!mountRef.current) return;
+
+    while (mountRef.current.firstChild) {
+      mountRef.current.removeChild(mountRef.current.firstChild);
+    }
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       45,
-      mount.clientWidth / mount.clientHeight,
+      mountRef.current.clientWidth / mountRef.current.clientHeight,
       0.1,
       1000
     );
     camera.position.z = 3;
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(mount.clientWidth, mount.clientHeight);
-    mount.appendChild(renderer.domElement);
+    renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+    mountRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.PlaneGeometry(0.5, 2);
-    const material = new THREE.MeshBasicMaterial({
-      color: "#e5e7eb",
-      side: THREE.DoubleSide,
-    });
-    const bar = new THREE.Mesh(geometry, material);
-    scene.add(bar);
+    // Base background bar
+    const baseBar = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.5, 2),
+      new THREE.MeshBasicMaterial({ color: "#e5e7eb", side: THREE.DoubleSide })
+    );
+    scene.add(baseBar);
 
-    const progressHeight = 2 * (progress / 100);
-    const progressGeometry = new THREE.PlaneGeometry(0.5, progressHeight);
-    const progressMaterial = new THREE.MeshBasicMaterial({
-      color: "#a855f7",
-      side: THREE.DoubleSide,
-    });
-    const progressBar = new THREE.Mesh(progressGeometry, progressMaterial);
+    // Progress indicator bar
+    const progressHeight = (2 * progress) / 100;
+    const progressBar = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.5, progressHeight),
+      new THREE.MeshBasicMaterial({ color: "#a855f7", side: THREE.DoubleSide })
+    );
     progressBar.position.y = -(1 - progressHeight / 2);
     scene.add(progressBar);
 
@@ -98,37 +81,32 @@ export default function WeightMeter() {
     animate();
 
     return () => {
-      mount.removeChild(renderer.domElement);
+      if (
+        mountRef.current &&
+        renderer.domElement.parentNode === mountRef.current
+      ) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, [progress]);
 
   return (
-    <div className="card p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all">
-      <h2 className="text-lg font-bold mb-2">Weekly Weight Tracker</h2>
-      <div ref={mountRef} className="w-full h-40 flex items-center justify-center" />
-      <p className="text-sm mb-3 text-center">
-        {weight ? `${weight} lbs (Goal: ${goal})` : "No entry this week"}
-      </p>
+    <div className="card p-6">
+      <h2 className="text-lg font-bold mb-2">Weight Tracker</h2>
+      <div ref={mountRef} className="w-full h-40" />
+      <p>{weight !== null ? `${weight} lbs (Goal: ${goal})` : "No entry yet"}</p>
       <div className="flex space-x-2">
         <input
           type="number"
-          min="80"
-          max="300"
-          step="1"
           value={tempWeight}
-          onChange={(e) => setTempWeight(Number(e.target.value))}
-          className="flex-1 p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-          placeholder="Enter weekly weight"
+          onChange={(e) => setTempWeight(e.target.value)}
+          className="flex-1 p-2 border rounded-xl"
+          placeholder="Enter weight"
         />
         <button
           onClick={handleSubmit}
-          disabled={weight !== null}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all ${
-            weight !== null
-              ? "bg-gray-400 text-white cursor-not-allowed"
-              : "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-[1.02] hover:shadow-lg"
-          }`}
+          className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold hover:scale-[1.02] hover:shadow-lg transition-all"
         >
           Submit
         </button>

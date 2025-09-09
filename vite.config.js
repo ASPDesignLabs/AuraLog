@@ -6,14 +6,19 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png"],
+      registerType: "prompt", // ✅ manual refresh only
+      includeAssets: [
+        "favicon.ico",
+        "icon-192.png",
+        "icon-512.png",
+        "offline.html",
+      ],
       manifest: {
-        name: "AuraLog",
-        short_name: "AuraLog",
+        name: "Auralog",
+        short_name: "Auralog",
         start_url: ".",
         display: "standalone",
-        background_color: "#ffffff",
+        background_color: "#0a0a0a",
         theme_color: "#2563eb",
         orientation: "portrait",
         icons: [
@@ -30,30 +35,37 @@ export default defineConfig({
         ],
       },
       workbox: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"], // ✅ precache all assets
         runtimeCaching: [
           {
+            // ✅ Cache JS, CSS, and workers for offline use
             urlPattern: ({ request }) =>
-              request.destination === "style" ||
               request.destination === "script" ||
+              request.destination === "style" ||
               request.destination === "worker",
-            handler: "StaleWhileRevalidate",
+            handler: "CacheFirst",
             options: {
-              cacheName: "static-resources",
+              cacheName: "app-shell",
+              expiration: { maxEntries: 50 },
             },
           },
           {
+            // ✅ Cache images (update when online, fallback offline)
             urlPattern: ({ request }) => request.destination === "image",
-            handler: "CacheFirst",
+            handler: "StaleWhileRevalidate",
             options: {
               cacheName: "image-cache",
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 7 * 24 * 60 * 60,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
               },
             },
           },
         ],
+        navigateFallback: "/offline.html", // ✅ fallback page if route not cached
       },
+      srcDir: "public",
+      filename: "sw.js", // ✅ ensure custom sw.js is used
     }),
   ],
 });

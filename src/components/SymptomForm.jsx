@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { db } from "../db/schema.js";
+import { secureAdd } from "../utils/encryption.js";
 
 const sensoryOptions = [
   "Dizziness",
   "Touch",
   "Sound",
   "Light",
-  "Environment",
-  "Movement",
+  "Headache",
+  "Nausea",
 ];
 
 export default function SymptomForm() {
@@ -16,182 +16,220 @@ export default function SymptomForm() {
   const [heartRateResting, setHeartRateResting] = useState("");
   const [emotionalState, setEmotionalState] = useState("regulated");
   const [emotionalNotes, setEmotionalNotes] = useState("");
-  const [calories, setCalories] = useState("");
-  const [medication, setMedication] = useState(false);
   const [sensory, setSensory] = useState({});
+  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [additionalMeds, setAdditionalMeds] = useState(false);
+  const [medications, setMedications] = useState({
+    ibuprofen: 0,
+    tylenol: 0,
+    naproxen: 0,
+  });
 
   const toggleSensory = (option) => {
     setSensory((prev) => {
       const updated = { ...prev };
-      if (updated[option]) {
-        delete updated[option];
-      } else {
-        updated[option] = 5;
-      }
+      if (updated[option] !== undefined) delete updated[option];
+      else updated[option] = 0;
       return updated;
     });
   };
 
-  const updateSeverity = (option, value) => {
-    setSensory((prev) => ({ ...prev, [option]: Number(value) }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!calories || calories <= 0) {
-      alert("Calories consumed is required.");
-      return;
-    }
-
-    const entry = {
-      date: new Date().toLocaleString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      }),
+    const now = new Date();
+    await secureAdd("symptoms", {
+      timestamp: now.toISOString(),
+      time: now.toLocaleTimeString("en-US"),
       pain: Number(pain),
       heartRateCurrent: heartRateCurrent ? Number(heartRateCurrent) : null,
       heartRateResting: heartRateResting ? Number(heartRateResting) : null,
       emotionalState,
       emotionalNotes: emotionalState === "dysregulated" ? emotionalNotes : "",
       sensory,
-      calories: Number(calories),
-      medication,
-    };
-
-    await db.symptoms.add(entry);
-    alert("Symptom entry saved!");
+      additionalNotes: additionalNotes.trim() || null,
+      additionalMeds: additionalMeds ? medications : null,
+    });
+    alert("✅ Symptom entry saved!");
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-xl p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all space-y-6 border border-white/20 dark:border-gray-700/40"
+      className="card p-6 space-y-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all"
     >
-      <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-        Log Symptoms
-      </h2>
+      <h2 className="text-2xl font-bold">Log Symptoms</h2>
 
       {/* Pain */}
       <label className="block">
-        <span className="font-medium">Pain Severity (1-10)</span>
+        <span className="font-medium">Pain Severity</span>
         <input
           type="range"
-          min="1"
+          min="0"
           max="10"
           value={pain}
           onChange={(e) => setPain(e.target.value)}
-          className="w-full accent-pink-500"
+          className="w-full accent-pink-500 hev:accent-orange-500 v:accent-cyan-400"
         />
-        <span className="text-sm text-gray-500">Current: {pain}</span>
+        <span className="text-sm">Current: {pain}</span>
       </label>
 
-      {/* Heart Rate */}
-      <label className="block">
-        <span className="font-medium">Current Heart Rate</span>
-        <input
-          type="number"
-          min="30"
-          max="220"
-          value={heartRateCurrent}
-          onChange={(e) => setHeartRateCurrent(e.target.value)}
-          className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        />
-      </label>
+      {/* Heart rates */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <label className="block">
+          <span className="font-medium">Current HR</span>
+          <input
+            type="number"
+            value={heartRateCurrent}
+            onChange={(e) => setHeartRateCurrent(e.target.value)}
+            className="w-full p-2 rounded-xl border focus:ring-2 outline-none
+                       hev:border-orange-500 hev:focus:ring-orange-400
+                       v:border-cyan-400 v:focus:ring-cyan-400"
+          />
+        </label>
+        <label className="block">
+          <span className="font-medium">Resting HR</span>
+          <input
+            type="number"
+            value={heartRateResting}
+            onChange={(e) => setHeartRateResting(e.target.value)}
+            className="w-full p-2 rounded-xl border focus:ring-2 outline-none
+                       hev:border-orange-500 hev:focus:ring-orange-400
+                       v:border-cyan-400 v:focus:ring-cyan-400"
+          />
+        </label>
+      </div>
 
-      <label className="block">
-        <span className="font-medium">Resting Heart Rate</span>
-        <input
-          type="number"
-          min="30"
-          max="220"
-          value={heartRateResting}
-          onChange={(e) => setHeartRateResting(e.target.value)}
-          className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-        />
-      </label>
-
-      {/* Emotional State */}
+      {/* Emotional state */}
       <label className="block">
         <span className="font-medium">Emotional State</span>
         <select
           value={emotionalState}
           onChange={(e) => setEmotionalState(e.target.value)}
-          className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+          className="w-full p-2 rounded-xl border focus:ring-2 outline-none
+                     hev:border-orange-500 hev:focus:ring-orange-400
+                     v:border-cyan-400 v:focus:ring-cyan-400"
         >
           <option value="regulated">Regulated</option>
           <option value="dysregulated">Dysregulated</option>
         </select>
       </label>
-
       {emotionalState === "dysregulated" && (
         <textarea
           placeholder="Describe feelings..."
           value={emotionalNotes}
           onChange={(e) => setEmotionalNotes(e.target.value)}
-          className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-400 focus:outline-none"
-          required
+          className="w-full p-2 rounded-xl border focus:ring-2 outline-none
+                     hev:border-orange-500 hev:focus:ring-orange-400
+                     v:border-cyan-400 v:focus:ring-cyan-400"
         />
       )}
 
-      {/* Sensory Troubles */}
+      {/* Sensory issues */}
       <div>
-        <h3 className="font-semibold">Sensory Troubles</h3>
-        {sensoryOptions.map((option) => (
-          <div key={option} className="mt-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={option in sensory}
-                onChange={() => toggleSensory(option)}
-              />
-              <span>{option}</span>
-            </label>
-            {option in sensory && (
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={sensory[option]}
-                onChange={(e) => updateSeverity(option, e.target.value)}
-                className="w-full accent-purple-500"
-              />
-            )}
-          </div>
-        ))}
+        <h3 className="font-semibold">Sensory Issues</h3>
+        <div className="grid md:grid-cols-2 gap-2">
+          {sensoryOptions.map((opt) => (
+            <div key={opt} className="mt-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={opt in sensory}
+                  onChange={() => toggleSensory(opt)}
+                  className="accent-purple-500 hev:accent-orange-500 v:accent-cyan-400"
+                />
+                <span>{opt}</span>
+              </label>
+              {opt in sensory && (
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={sensory[opt]}
+                  onChange={(e) =>
+                    setSensory((prev) => ({
+                      ...prev,
+                      [opt]: Number(e.target.value),
+                    }))
+                  }
+                  className="w-full accent-purple-500 hev:accent-orange-500 v:accent-cyan-400"
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Calories */}
-      <label className="block">
-        <span className="font-medium">Calories Consumed</span>
-        <input
-          type="number"
-          min="0"
-          max="10000"
-          required
-          value={calories}
-          onChange={(e) => setCalories(e.target.value)}
-          className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-green-400 focus:outline-none"
-        />
-      </label>
-
-      {/* Medication */}
+      {/* Additional Meds */}
       <label className="flex items-center space-x-2">
         <input
           type="checkbox"
-          checked={medication}
-          onChange={(e) => setMedication(e.target.checked)}
+          checked={additionalMeds}
+          onChange={(e) => setAdditionalMeds(e.target.checked)}
+          className="accent-purple-500 hev:accent-orange-500 v:accent-cyan-400"
         />
-        <span>Medication Taken</span>
+        <span>Additional Medication Taken</span>
+      </label>
+      {additionalMeds && (
+        <div className="grid md:grid-cols-3 gap-3 p-3 rounded-xl hev:border-orange-500 v:border-cyan-400">
+          <input
+            type="number"
+            placeholder="Ibuprofen"
+            value={medications.ibuprofen}
+            onChange={(e) =>
+              setMedications((prev) => ({
+                ...prev,
+                ibuprofen: Number(e.target.value),
+              }))
+            }
+            className="w-full p-2 rounded-xl border"
+          />
+          <input
+            type="number"
+            placeholder="Tylenol"
+            value={medications.tylenol}
+            onChange={(e) =>
+              setMedications((prev) => ({
+                ...prev,
+                tylenol: Number(e.target.value),
+              }))
+            }
+            className="w-full p-2 rounded-xl border"
+          />
+          <input
+            type="number"
+            placeholder="Naproxen"
+            value={medications.naproxen}
+            onChange={(e) =>
+              setMedications((prev) => ({
+                ...prev,
+                naproxen: Number(e.target.value),
+              }))
+            }
+            className="w-full p-2 rounded-xl border"
+          />
+        </div>
+      )}
+
+      {/* Additional Notes */}
+      <label className="block">
+        <span className="font-medium">Additional Notes</span>
+        <textarea
+          placeholder="Any extra details..."
+          value={additionalNotes}
+          onChange={(e) => setAdditionalNotes(e.target.value)}
+          className="w-full p-2 rounded-xl border focus:ring-2 outline-none
+                     hev:border-orange-500 hev:focus:ring-orange-400
+                     v:border-cyan-400 v:focus:ring-cyan-400"
+        />
       </label>
 
+      {/* Submit */}
       <button
         type="submit"
-        className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-3 rounded-xl font-semibold hover:scale-[1.02] hover:shadow-lg transition-all"
+        className="w-full px-4 py-3 rounded-xl font-semibold transition-all
+                   bg-gradient-to-r from-blue-500 to-indigo-500 text-white
+                   hev:from-orange-500 hev:to-yellow-500
+                   v:from-red-600 v:to-red-800 v:text-cyan-200"
       >
         Save Entry
       </button>

@@ -19,15 +19,15 @@
 
 /* === Global Theme Text Fixes === */
 
-/* Light mode (default) */
+/* Light mode */
 .light body {
-  color: #1f2937; /* Tailwind gray-800 */
+  color: #1f2937; /* gray-800 */
   background-color: #f9fafb; /* gray-50 */
 }
 
 /* Dark mode */
 .dark body {
-  color: #f3f4f6; /* Tailwind gray-100 */
+  color: #f3f4f6; /* gray-100 */
   background-color: #111827; /* gray-900 */
 }
 
@@ -37,8 +37,6 @@
   background: linear-gradient(to bottom, #1a1a1a 0%, #404040 100%);
   position: relative;
 }
-
-/* Scanline overlay for HEV */
 .hev body::before {
   content: "";
   position: fixed;
@@ -66,4 +64,164 @@
   box-shadow: 0 0 10px rgba(255, 165, 0, 0.4);
   background-color: rgba(40, 40, 40, 0.85);
   color: #ffb347;
+}
+
+/* === V Theme (Cyberpunk-inspired) === */
+.v body {
+  color: #00e0ff; /* neon cyan text */
+  background-color: #0a0a0a; /* deep black background */
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* === HEV Top Bar Buttons === */
+.hev header button {
+  background-color: #ff8000 !important; /* deep orange */
+  color: #1a1a1a !important; /* dark text for contrast */
+  border: 2px solid #ffb347;
+  box-shadow: 0 0 6px rgba(255, 179, 71, 0.6);
+}
+.hev header button:hover {
+  background-color: #ff9933 !important;
+  box-shadow: 0 0 10px rgba(255, 179, 71, 0.8);
+}
+
+/* === V Top Bar Buttons === */
+.v header button {
+  background-color: #450101 !important; /* deep dark red */
+  color: #00e0ff !important; /* cyan text */
+  border: 2px solid #00e0ff;
+  box-shadow: 0 0 6px rgba(0, 224, 255, 0.6);
+}
+.v header button:hover {
+  background-color: #5a0a0a !important;
+  box-shadow: 0 0 10px #00e0ff;
+}
+
+/* === V Theme Cards (including Transcription box) === */
+.v .card {
+  background-color: rgba(69, 1, 1, 0.9) !important; /* 90% transparent deep dark red */
+  border: 2px solid #00e0ff; /* cyan outline */
+  color: #00e0ff !important; /* cyan text */
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.3);
+}
+
+/* === HEV Top Bar === */
+.hev header {
+  background-color: #ff8000 !important; /* deep orange */
+  border-bottom: 2px solid #ffb347; /* lighter orange edge */
+  box-shadow: inset 0 -2px 8px rgba(255, 179, 71, 0.6); /* inner glow */
+}
+
+/* === V Top Bar === */
+.v header {
+  background-color: #420000 !important; /* deep blood red */
+  border-bottom: 2px solid #00e0ff; /* cyan edge */
+  box-shadow: inset 0 -2px 8px rgba(0, 224, 255, 0.6); /* cyan glow */
+}
+
+/* === V Theme Menu Slideout === */
+.v .menu-panel {
+  background-color: rgba(69, 1, 1, 0.85); /* transparent red */
+  border: 2px solid #00e0ff; /* cyan outline */
+  box-shadow: 0 0 15px rgba(0, 224, 255, 0.4);
+}
+
+/* === V Theme Menu Buttons === */
+.v .menu-button {
+  background-color: #450101;
+  border: 2px solid #00e0ff;
+  color: #00e0ff;
+  border-radius: 0; /* square */
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+.v .menu-button:hover {
+  background-color: #5a0a0a;
+  box-shadow: 0 0 10px #00e0ff;
+}
+.v .menu-button.active {
+  background-color: #d6002f;
+  color: #00e0ff;
+}
+
+/* === Cyberpunk Shimmer Animation for V Theme === */
+@keyframes cyberpunk-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.v-shimmer {
+  background: linear-gradient(
+    120deg,
+    rgba(0, 224, 255, 0.15) 0%,
+    rgba(214, 0, 47, 0.15) 50%,
+    rgba(0, 224, 255, 0.15) 100%
+  );
+  background-size: 200% 200%;
+  animation: cyberpunk-shimmer 12s ease-in-out infinite;
+  pointer-events: none;
+}
+/* === HEV Theme Dashboard Inputs & Buttons === */
+.hev input,
+.hev select,
+.hev textarea {
+  background-color: rgba(40, 40, 40, 0.85);
+  border: 2px solid #ff8000;
+  color: #ffb347;
+}
+.hev input:focus,
+.hev select:focus,
+.hev textarea:focus {
+  outline: none;
+  border-color: #ffb347;
+  box-shadow: 0 0 6px #ff8000;
+}
+.hev button {
+  background: linear-gradient(to right, #ff8000, #ffb347);
+  color: #1a1a1a;
+  font-weight: bold;
+  border: 2px solid #ffb347;
+  transition: all 0.2s ease-in-out;
+}
+.hev button:hover {
+  box-shadow: 0 0 10px #ff8000;
+  transform: scale(1.02);
+}
+
+/* === V Theme Dashboard Inputs & Buttons === */
+.v input,
+.v select,
+.v textarea {
+  background-color: rgba(69, 1, 1, 0.9);
+  border: 2px solid #00e0ff;
+  color: #00e0ff;
+}
+.v input:focus,
+.v select:focus,
+.v textarea:focus {
+  outline: none;
+  border-color: #00e0ff;
+  box-shadow: 0 0 6px #00e0ff;
+}
+.v button {
+  background-color: #450101;
+  border: 2px solid #00e0ff;
+  color: #00e0ff;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: all 0.2s ease-in-out;
+}
+.v button:hover {
+  background-color: #5a0a0a;
+  box-shadow: 0 0 10px #00e0ff;
+  transform: scale(1.02);
 }

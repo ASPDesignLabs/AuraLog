@@ -1,119 +1,130 @@
 import { useState, useEffect, useRef } from "react";
-import { db } from "../db/schema.js";
 
 export default function StimmingSurface() {
-  const [points, setPoints] = useState([]);
-  const [glow, setGlow] = useState(false);
-  const [ripples, setRipples] = useState([]);
-  const surfaceRef = useRef(null);
-  const [settings, setSettings] = useState({
-    numPoints: 10,
-    glowDuration: 600,
-    colorMode: "white",
-  });
+  const [theme, setTheme] = useState("light");
+  const hapticLoopRef = useRef(null);
 
   useEffect(() => {
-    // Load settings
-    const saved = localStorage.getItem("stimmingSettings");
-    if (saved) setSettings(JSON.parse(saved));
+    const html = document.documentElement;
+    if (html.classList.contains("dark")) setTheme("dark");
+    else if (html.classList.contains("hev")) setTheme("hev");
+    else if (html.classList.contains("v")) setTheme("v");
+    else setTheme("light");
 
-    const today = new Date().toLocaleDateString("en-US");
-
-    // Load today's points or generate new ones
-    db.stimming
-      .where("date")
-      .equals(today)
-      .first()
-      .then((entry) => {
-        if (entry) {
-          setPoints(entry.points);
-        } else {
-          const newPoints = Array.from({ length: settings.numPoints }).map(
-            () => ({
-              x: Math.random(),
-              y: Math.random(),
-              intensity: Math.floor(Math.random() * 3) + 1,
-              duration: 50 + Math.floor(Math.random() * 200),
-            })
-          );
-          setPoints(newPoints);
-          db.stimming.put({ date: today, points: newPoints });
-        }
-      });
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+      stopHaptics();
+    };
   }, []);
 
-  const handleTouch = (e) => {
-    e.preventDefault(); // 🚫 stop scroll/refresh
-    if (!surfaceRef.current) return;
-    const rect = surfaceRef.current.getBoundingClientRect();
-    const touch = e.touches[0];
-    const x = (touch.clientX - rect.left) / rect.width;
-    const y = (touch.clientY - rect.top) / rect.height;
-
-    // Add ripple
-    addRipple(touch.clientX - rect.left, touch.clientY - rect.top);
-
-    // Check hidden points
-    points.forEach((p) => {
-      const dx = x - p.x;
-      const dy = y - p.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 0.05) {
-        triggerFeedback(p);
-      }
-    });
-  };
-
-  const triggerFeedback = (point) => {
+  const triggerHaptics = (pattern) => {
     if ("vibrate" in navigator) {
-      const pattern = Array(point.intensity).fill(point.duration);
       navigator.vibrate(pattern);
     }
-    setGlow(true);
-    setTimeout(() => setGlow(false), settings.glowDuration);
   };
 
-  const addRipple = (x, y) => {
-    const id = Date.now();
-    setRipples((prev) => [...prev, { id, x, y }]);
-    setTimeout(() => {
-      setRipples((prev) => prev.filter((r) => r.id !== id));
-    }, 1000);
+  const stopHaptics = () => {
+    if (hapticLoopRef.current) {
+      clearInterval(hapticLoopRef.current);
+      hapticLoopRef.current = null;
+    }
+    triggerHaptics(0);
   };
+
+  // === Unique Haptic Profiles (continuous) ===
+  const startWavePulse = () => {
+    stopHaptics();
+    hapticLoopRef.current = setInterval(() => {
+      triggerHaptics([50, 100, 100, 100, 200, 100, 100, 100, 50, 200]);
+    }, 1200);
+  };
+
+  const startHeartbeat = () => {
+    stopHaptics();
+    hapticLoopRef.current = setInterval(() => {
+      triggerHaptics([80, 80, 200, 150, 0, 300, 80, 80, 200, 150]);
+    }, 1500);
+  };
+
+  const startThunder = () => {
+    stopHaptics();
+    hapticLoopRef.current = setInterval(() => {
+      triggerHaptics([300, 100, 50, 50, 400, 200, 100, 50, 500, 300]);
+    }, 2000);
+  };
+
+  // === Theme Styles ===
+  const themeStyles = {
+    light: {
+      button:
+        "bg-blue-100 text-blue-700 border-blue-400 hover:bg-blue-200 active:bg-blue-300",
+      slider: "accent-blue-500",
+    },
+    dark: {
+      button:
+        "bg-purple-900 text-purple-200 border-purple-500 hover:bg-purple-800 active:bg-purple-700",
+      slider: "accent-purple-400",
+    },
+    hev: {
+      button:
+        "bg-orange-900 text-orange-300 border-orange-500 hover:bg-orange-800 active:bg-orange-700",
+      slider: "accent-orange-500",
+    },
+    v: {
+      button:
+        "bg-red-900 text-cyan-300 border-cyan-500 hover:bg-red-800 active:bg-red-700",
+      slider: "accent-cyan-400",
+    },
+  };
+
+  const t = themeStyles[theme];
 
   return (
-    <div
-      ref={surfaceRef}
-      onTouchMove={handleTouch}
-      onTouchStart={handleTouch}
-      className={`w-full h-[calc(100vh-5rem)] rounded-2xl relative overflow-hidden 
-        bg-gray-400 bg-opacity-50 backdrop-blur-xl touch-none select-none
-        transition-all duration-500
-        ${
-          glow
-            ? settings.colorMode === "random"
-              ? "bg-gray-200 shadow-[0_0_40px_rgba(0,200,255,0.6)]"
-              : "bg-gray-200 shadow-[0_0_40px_rgba(255,255,255,0.6)]"
-            : ""
-        }`}
-    >
-      {/* Subtle overlay */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/10 to-black/10" />
+    <div className="w-full h-[calc(100vh-5rem)] flex flex-col items-center justify-center space-y-6 p-6 select-none">
+      {/* Horizontal Slider (no text) */}
+      <input
+        type="range"
+        min="0"
+        max="9"
+        step="1"
+        className={`w-full max-w-lg ${t.slider}`}
+        onChange={(e) => triggerHaptics(Number(e.target.value) * 20)}
+      />
 
-      {/* Ripples */}
-      {ripples.map((r) => (
-        <span
-          key={r.id}
-          className="absolute rounded-full bg-white/40 dark:bg-white/30 animate-ripple"
-          style={{
-            left: r.x,
-            top: r.y,
-            transform: "translate(-50%, -50%)",
-            width: "20px",
-            height: "20px",
-          }}
-        />
-      ))}
+      {/* Stimming Buttons */}
+      <button
+        onMouseDown={startWavePulse}
+        onTouchStart={startWavePulse}
+        onMouseUp={stopHaptics}
+        onTouchEnd={stopHaptics}
+        onMouseLeave={stopHaptics}
+        className={`w-64 py-6 rounded-xl border-2 font-semibold transition ${t.button} select-none`}
+      >
+        🌊 Wave Pulse
+      </button>
+
+      <button
+        onMouseDown={startHeartbeat}
+        onTouchStart={startHeartbeat}
+        onMouseUp={stopHaptics}
+        onTouchEnd={stopHaptics}
+        onMouseLeave={stopHaptics}
+        className={`w-64 py-6 rounded-xl border-2 font-semibold transition ${t.button} select-none`}
+      >
+        ❤️ Heartbeat
+      </button>
+
+      <button
+        onMouseDown={startThunder}
+        onTouchStart={startThunder}
+        onMouseUp={stopHaptics}
+        onTouchEnd={stopHaptics}
+        onMouseLeave={stopHaptics}
+        className={`w-64 py-6 rounded-xl border-2 font-semibold transition ${t.button} select-none`}
+      >
+        ⚡ Thunder
+      </button>
     </div>
   );
 }
