@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Auralog – Wellness & Privacy First</title>
+    <meta
+      name="description"
+      content="Auralog is a privacy-first wellness and accessibility tracker PWA. Manage symptoms, routines, medication, and lifestyle with full encryption and HIPAA-aligned safeguards."
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- TailwindCDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <!-- Hero / Heading -->
+    <header class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+      <div class="max-w-4xl mx-auto px-6 py-16 text-center">
+        <h1 class="text-5xl font-extrabold mb-4">Auralog</h1>
+        <p class="text-xl font-light">
+          Your Health • Your Data • Your Way
+        </p>
+      </div>
+    </header>
+
+    <!-- Intro -->
+    <section class="max-w-4xl mx-auto px-6 py-12">
+      <h2 class="text-2xl font-bold mb-4">🌱 Wellness Focus</h2>
+      <p class="mb-4">
+        Auralog is your private health companion. It helps track <strong>
+          symptoms, nutrition, sleep, work, weight, nicotine, and medication
+        </strong>
+        – while never sharing your data anywhere. Everything is stored only on your
+        device, fully encrypted.
+      </p>
+      <p>
+        Accessibility is part of Auralog’s DNA: stimming tools, live
+        transcription, and calming themes make it inclusive for neurodivergent
+        and chronic health journeys.
+      </p>
+    </section>
+
+    <!-- Security -->
+    <section class="bg-gray-100 dark:bg-gray-800 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <h2 class="text-2xl font-bold mb-4">🔒 Privacy & Security</h2>
+        <ul class="list-disc list-inside space-y-2">
+          <li>
+            <strong>All data is encrypted (AES‑256‑GCM)</strong> – nothing stored in
+            plaintext.
+          </li>
+          <li>
+            <strong>Unlock with PIN (hardened PBKDF2) or Passkey/Biometrics</strong>.
+          </li>
+          <li>
+            <strong>Automatic lockout</strong> after inactivity (default 10 minutes).
+          </li>
+          <li>
+            <strong>Encrypted Audit Trail</strong> – logs when entries are added,
+            viewed, or exported, supporting HIPAA audit rules.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Compliance -->
+    <section class="max-w-4xl mx-auto px-6 py-12">
+      <h2 class="text-2xl font-bold mb-4">🛡️ HIPAA Alignment</h2>
+      <p>
+        Auralog is actively built with HIPAA’s Technical Safeguards (§164.312)
+        in mind. Current status:
+      </p>
+      <ul class="list-disc list-inside space-y-2 mt-2">
+        <li>✅ Access Control – PIN/Passkey auth + auto‑logoff</li>
+        <li>✅ Integrity – AES‑GCM check + encrypted audit trail</li>
+        <li>✅ Authentication – PIN + Biometrics</li>
+        <li>✅ Local Audit Controls – append‑only secure logs</li>
+        <li>🚧 Pending: Immutable log backups, secure deletion guarantees</li>
+      </ul>
+      <p class="mt-4 italic text-sm">
+        *Note: Auralog is not a medical device. It is a self‑tracking and
+        reflection tool to complement professional care.*
+      </p>
+    </section>
+
+    <!-- Modules -->
+    <section class="bg-gray-100 dark:bg-gray-800 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <h2 class="text-2xl font-bold mb-4">🧩 Core Modules</h2>
+        <div class="grid md:grid-cols-2 gap-6 text-sm">
+          <div class="p-4 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="font-semibold mb-2">📊 Trackers</h3>
+            <p>Calories, Weight, Sleep, Work, Nicotine.</p>
+          </div>
+          <div className="p-4 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="font-semibold mb-2">🩺 Symptom Log</h3>
+            <p>Pain, emotional state, sensory triggers, meds, notes.</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="font-semibold mb-2">💊 Medication</h3>
+            <p>Daily reminders and compliance support.</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-gray-900 rounded-xl shadow">
+            <h3 class="font-semibold mb-2">🎛️ Accessibility</h3>
+            <p>Stimming Surface, live transcription, themed interfaces.</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-gray-900 rounded-xl shadow md:col-span-2">
+            <h3 class="font-semibold mb-2">📑 Data Management</h3>
+            <p>
+              Export/Import backups, reset, install/update, passkey registration,
+              offline caching, and encrypted audit trail viewer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Use -->
+    <section class="max-w-4xl mx-auto px-6 py-12">
+      <h2 class="text-2xl font-bold mb-4">🚦 How to Get Started</h2>
+      <ol class="list-decimal list-inside space-y-2">
+        <li>Install Node.js v18+ and Git on your system.</li>
+        <li>Clone the repo: <code>git clone …</code></li>
+        <li>Run locally with <code>npm install && npm run dev</code>.</li>
+        <li>
+          First run: app must be served at <strong>HTTPS</strong> or localhost for
+          install prompt & offline mode to work.
+        </li>
+      </ol>
+      <p class="mt-4 text-sm italic">
+        Auralog treats your health data as yours alone – no hidden sync, no cloud
+        store, no brokers.
+      </p>
+    </section>
+
+    <!-- Credits -->
+    <section class="bg-gray-100 dark:bg-gray-800 py-12">
+      <div class="max-w-4xl mx-auto px-6">
+        <h2 class="text-2xl font-bold mb-4">🙌 Credits</h2>
+        <p>
+          Auralog exists thanks to the brilliant open source community. Core
+          technologies include:
+        </p>
+        <ul class="list-disc list-inside space-y-1 mt-3 text-sm">
+          <li><a class="text-blue-500 hover:underline" href="https://react.dev/">React</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://vitejs.dev/">Vite</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://tailwindcss.com/">Tailwind CSS</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://dexie.org/">Dexie.js</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://www.chartjs.org/">Chart.js</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://github.com/parallax/jsPDF">jsPDF</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://threejs.org/">Three.js</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://vite-pwa-org.netlify.app/">Vite Plugin PWA</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://developer.chrome.com/docs/workbox/">Workbox</a></li>
+          <li><a class="text-blue-500 hover:underline" href="https://www.npmjs.com/package/react-speech-recognition">react-speech-recognition</a></li>
+        </ul>
+        <p class="mt-3 text-sm italic">
+          💡 Credit belongs overwhelmingly to these authors. Auralog is only possible
+          because of their generosity.
+        </p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="max-w-4xl mx-auto py-8 px-6 text-center text-sm text-gray-500 dark:text-gray-400">
+      <p>© 2025 Auralog. Your Health • Your Data • Your Way.</p>
+    </footer>
+  </body>
+</html>
